@@ -40,7 +40,7 @@ layout: two-cols
 
 - 🧑 Independent consultant on **railway data** with a linked data preference
 - 🛤️ Current & past work: ERA RINF, Bane NOR DIM, Infrabel, railML
-- 💻 Open source: <a href="https://yasgui.matdata.eu/">yasgui.matdata.eu</a>, SPARQL notebooks, Docker Jena+GeoSPARQL
+- 💻 Open source: <a href="https://yasgui.matdata.eu/">yasgui.matdata.eu</a>, Docker Jena+GeoSPARQL, [tp-lib](https://github.com/Matdata-eu/tp-lib), [uri-dereferencer](https://github.com/Matdata-eu/uri-dereferencer), [W3C CG Facade-X](https://github.com/w3c-facade-x)
 - 🌐 Website: **<a href="https://matdata.eu/">matdata.eu</a>**
 - 📫 Reach me: through my website
 
@@ -73,22 +73,24 @@ layout: default
 | # | Block | ~Time |
 |---|-------|-------|
 | 1 | 👋 Intro & why Linked Data | 20 min |
-| 2 | 🧱 RDF: triples, IRIs, literals | 25 min |
-| 3 | 📝 Turtle & serializations | 15 min |
-| 4 | 🧪 **Hands-on 1** — Describe yourself in TTL | 25 min |
-| 5 | 🌍 Real-world knowledge graphs | 25 min |
+| 2 | 🔑 IRIs — the global identifiers | 25 min |
+| 3 | 🧱 RDF: triples, literals, blank nodes | 20 min |
+| 4 | 📝 Turtle & serializations | 15 min |
+| 5 | 🧪 **Hands-on 1** — Describe yourself in TTL | 25 min |
+| 6 | 🌍 Real-world knowledge graphs | 25 min |
 
 </div>
 <div>
 
 | # | Block | ~Time |
 |---|-------|-------|
-| 6 | 📚 Ontologies & vocabularies | 20 min |
-| 7 | 🔎 SPARQL basics | 20 min |
-| 8 | 🧪 **Hands-on 2** — Query ERA RINF | 20 min |
-| 9 | ✅ SHACL validation | 15 min |
-| 10 | 🧪 **Hands-on 3** — Validate your TTL | 15 min |
-| 11 | 🧰 Tools, publishing, wrap-up | 15 min |
+| 7 | 📚 Ontologies & vocabularies | 20 min |
+| 8 | 🔎 SPARQL basics | 20 min |
+| 9 | 🧪 **Hands-on 2** — Query ERA RINF | 20 min |
+| 10 | ✅ SHACL validation | 15 min |
+| 11 | 🧪 **Hands-on 3** — Validate your TTL | 15 min |
+| 12 | � Linked Data & LLMs | 15 min |
+| 13 | 🧰 Tools, publishing, wrap-up | 10 min |
 
 </div>
 </div>
@@ -158,18 +160,34 @@ graph TD
 
 </v-click>
 
-<!--
-Show of hands: who has a mapping table for "customer" between two systems?
--->
+
+
+---
+layout: default
+---
+
+# 🚂 The Railway Data Problem
+
+We have such a beautiful system…
+
+<img src="./assets/railway-reality-dark.svg" class="max-h-80 w-full object-contain" />
+
+---
+layout: default
+---
+
+# 🚂 The Railway Data Problem
+
+But we decided to break it into pieces we call "use cases"…
+
+<img src="./assets/railway-reality-dark-silos.svg" class="max-h-80 w-full object-contain" />
+
 
 ---
 layout: default
 ---
 
 # 🎯 What Linked Data gives you
-
-<div class="grid grid-cols-2 gap-6 mt-2">
-<div>
 
 <v-clicks>
 
@@ -181,12 +199,6 @@ layout: default
 - 🌍 **Interoperable by design** — built for the Web
 
 </v-clicks>
-
-</div>
-<div>
-
-</div>
-</div>
 
 <!--
 5-star model is the classic framing. Most "open data" stops at 3 stars — CSV on a portal. Linked Data is 4–5 stars.
@@ -249,9 +261,258 @@ XML and JSON force you into a tree. RDF lets reality be a graph.
 layout: section
 ---
 
-# Part 2 — RDF
+# Part 2 — IRIs
 
-**Subject · Predicate · Object**
+The global identifier system
+
+---
+layout: default
+---
+
+# 🔑 IRIs — the global identifiers
+
+An **IRI** (Internationalised Resource Identifier) identifies a resource *globally*.
+
+```turtle
+<https://matdata.eu/#me>                 # me, the person
+<https://www.wikidata.org/entity/Q31>    # Belgium, on Wikidata
+<https://schema.org/Person>              # the concept "Person"
+<http://data.europa.eu/949/BEFBMZ>       # Brussels-Midi station (ERA)
+<urn:isbn:9780140328721>                 # The BFG, by Roald Dahl
+```
+
+<v-clicks>
+
+- 🌍 **Global** — no naming collisions across organisations or datasets
+- 🧩 **Reusable** — anyone, anywhere can say something about the same IRI
+- 🔗 **Dereferenceable** (ideally) — open it in a browser, get documentation
+- ♾️ **Forever** — a good IRI is stable for decades
+
+</v-clicks>
+
+<v-click>
+
+<div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900 rounded text-gray-800 dark:text-gray-100 text-sm">
+🗝️ <strong>The single most important idea in Linked Data:</strong> if we all agree to use the <em>same IRI</em> for the same thing, our data merges by itself.
+</div>
+
+</v-click>
+
+<!--
+Before IRIs: every system had its own customer ID, product SKU, station code. Integration = mapping tables.
+After IRIs: the ID is the integration.
+-->
+
+---
+layout: two-cols
+---
+
+# 🧬 Anatomy of an IRI
+
+```
+  https://www.wikidata.org/entity/Q31#this
+  └─┬─┘   └────────┬────────┘└───┬──┘ └┬─┘
+  scheme     authority        path  fragment
+```
+
+<v-clicks>
+
+- **scheme** — `https`, `http`, `urn`, `did`, `tag`, …
+- **authority** — who *governs* this IRI space (DNS name usually)
+- **path** — the local identifier inside that authority
+- **fragment** (`#…`) — a sub-part of the document; never sent to the server
+- **query** (`?…`) — rarely used in IRIs; avoid in identifiers
+
+</v-clicks>
+
+::right::
+
+<v-click>
+
+### 🔤 The "I" in IRI
+
+URIs are ASCII-only. **IRIs allow Unicode**:
+
+```turtle
+<https://matdata.eu/people/松本#me>
+<https://example.org/ville/Liège>
+<https://example.org/🍕>   # technically valid. please don't.
+```
+
+Under the hood an IRI is %-encoded into a URI when it hits the wire.
+
+</v-click>
+
+<v-click>
+
+<div class="mt-4 p-2 bg-blue-50 dark:bg-blue-900 rounded text-gray-800 dark:text-gray-100 text-xs">
+💡 In practice <strong>99 % of Linked Data IRIs are HTTPS URLs</strong>. The rest of this deck calls them "IRIs" but you can read "URL".
+</div>
+
+</v-click>
+
+---
+layout: default
+---
+
+# 🌀 URI vs URL vs URN vs IRI
+
+The terminology is genuinely confusing. Here's the short version:
+
+<div class="grid grid-cols-2 gap-4 mt-4 text-sm">
+<div class="bg-gray-100 dark:bg-gray-800 rounded p-3">
+
+**URI** — Uniform Resource **Identifier**  
+The umbrella. Names a thing.
+
+**URL** — Uniform Resource **Locator**  
+A URI that also *tells you where to fetch it*.
+
+**URN** — Uniform Resource **Name**  
+A URI that *only* names, never locates. `urn:isbn:…`, `urn:uuid:…`
+
+**IRI** — **Internationalised** Resource Identifier  
+Same as URI, but Unicode-capable.
+
+</div>
+<div>
+
+```mermaid
+flowchart TB
+    IRI[IRI<br/>Unicode] --> URI[URI<br/>ASCII]
+    URI --> URL[URL<br/>locator]
+    URI --> URN[URN<br/>name only]
+
+    style IRI fill:#1a3a5c,color:#fff
+    style URI fill:#2a4a6c,color:#fff
+    style URL fill:#1a5c3a,color:#fff
+    style URN fill:#5c3a1a,color:#fff
+```
+
+</div>
+</div>
+
+---
+layout: default
+---
+
+# 🔗 Dereferenceable IRIs & content negotiation
+
+**Dereferenceable** = you can paste the IRI in a browser and get something useful back.
+
+```mermaid
+sequenceDiagram
+    participant U as 👤 User / app
+    participant S as 🌐 Server
+    U->>S: GET https://www.wikidata.org/entity/Q31<br/>Accept: text/html
+    S-->>U: 303 → /wiki/Q31 (HTML page)
+    U->>S: GET https://www.wikidata.org/entity/Q31<br/>Accept: text/turtle
+    S-->>U: 303 → /entity/Q31.ttl (RDF)
+```
+
+---
+layout: default
+---
+
+# 🔗 Dereferenceable IRIs & content negotiation
+
+<v-clicks>
+
+- 🤝 The **same IRI** serves humans (HTML) and machines (Turtle, JSON-LD, N-Triples)
+- 🧭 The `Accept:` header drives the redirect — classic HTTP, no magic
+- 🪝 Try it yourself: `curl -LH "Accept: text/turtle" https://www.wikidata.org/entity/Q31`
+- 🏷️ The "303 See Other" pattern distinguishes **the thing** from **a document about the thing**
+
+</v-clicks>
+
+---
+layout: default
+---
+
+# 🧊 "Cool URIs don't change"
+
+Tim Berners-Lee, 1998 — still the rulebook ([W3C note](https://www.w3.org/Provider/Style/URI)).
+
+<div class="grid grid-cols-2 gap-6 mt-4 text-sm">
+<div>
+
+**✅ Do**
+
+
+- Use your **own domain** you control (you're committing for decades)
+- Keep IRIs **opaque** — no tech details (`.php`, `.aspx`) or version numbers
+- Use **lowercase**, ASCII-safe slugs; avoid spaces & punctuation
+- Pick a **pattern** and stick to it (`/entity/Q31`, `/book/9780140328721`)
+- Plan **redirects** forever — if something moves, 301 it
+
+</div>
+<div>
+
+**❌ Don't**
+
+- Don't embed the **implementation** (`/cgi-bin/lookup.pl?id=42`)
+- Don't use **session IDs** or timestamps in IRIs
+- Don't use **ephemeral domains** (company mergers, product rebrands)
+- Don't reuse an IRI for a different thing — ever
+- Don't mint an IRI you can't host forever; **prefer existing ones** (Wikidata, DOI, ORCID…)
+
+</div>
+</div>
+
+---
+layout: default
+---
+
+# 🏛️ IRIs in the wild — patterns to reuse
+
+<div class="grid grid-cols-2 gap-4 text-xs">
+<div class="bg-gray-100 dark:bg-gray-800 rounded p-3">
+
+**People & organisations**
+
+- 🆔 **ORCID** — `https://orcid.org/0000-0002-1825-0097`
+- 🌐 **ROR** (orgs) — `https://ror.org/02catss52`
+- 🧑 **Wikidata Q** — `https://www.wikidata.org/entity/Q937` (Einstein)
+
+**Publications & works**
+
+- 📄 **DOI** — `https://doi.org/10.1000/182`
+- 📚 **ISBN** — `urn:isbn:9780140328721`
+- 🎞️ **IMDb → Wikidata** — better to link via `wdt:P345`
+
+</div>
+<div class="bg-gray-100 dark:bg-gray-800 rounded p-3">
+
+**Concepts & vocabularies**
+
+- 🏷️ **schema.org** — `https://schema.org/Person`
+- 🧭 **SKOS / thesauri** — `http://vocabularies.unesco.org/thesaurus/concept123`
+- 🌍 **GeoNames** — `https://sws.geonames.org/2802361/` (Brussels)
+
+**Domain data**
+
+- 🚂 **ERA** — `http://data.europa.eu/949/BEFBMZ`
+- 🧬 **UniProt** — `http://purl.uniprot.org/uniprot/P12345`
+- 🌐 **EU publications** — `http://publications.europa.eu/resource/authority/country/BEL`
+
+</div>
+</div>
+
+<v-click>
+
+<div class="mt-4 p-3 bg-green-50 dark:bg-green-900 rounded text-gray-800 dark:text-gray-100 text-sm">
+♻️ <strong>Reuse before you mint.</strong> Every time you use a Wikidata / DOI / ORCID IRI, your data joins a global graph for free.
+</div>
+
+</v-click>
+
+---
+layout: section
+---
+
+# Part 3 — RDF
+
+**The triple model**
 
 ---
 layout: default
@@ -286,38 +547,6 @@ Everything in RDF is a statement of the form:
 <!--
 Whiteboard this. Three dots and two arrows. That's the entire data model.
 -->
-
----
-layout: default
----
-
-# 🔑 IRIs — the global identifiers
-
-An **IRI** (Internationalised Resource Identifier) identifies a resource *globally*.
-
-```turtle
-<https://matdata.eu/#me>          # me, the person
-<https://www.wikidata.org/entity/Q31>  # Belgium, on Wikidata
-<https://schema.org/Person>       # the concept "Person"
-```
-
-<v-clicks>
-
-- 🌍 **Global** — no naming collisions across organisations
-- 🔗 **Dereferenceable** — open it in a browser and get documentation (ideally)
-- 🧩 **Reusable** — anyone can say something about the same IRI
-
-</v-clicks>
-
-<v-click>
-
-<div class="mt-4 text-sm">
-
-> ⚠️ <strong>IRI ≠ URL.</strong> An IRI identifies. A URL locates. In Linked Data we try to make them the same, but conceptually they're different.
-
-</div>
-
-</v-click>
 
 ---
 layout: default
@@ -370,12 +599,11 @@ Sometimes you need a node that has no global identity — an anonymous "helper" 
 - 💡 Use an IRI whenever a node might be referenced elsewhere
 
 </v-clicks>
-
 ---
 layout: section
 ---
 
-# Part 3 — Turtle
+# Part 4 — Turtle
 
 The friendly serialization
 
@@ -542,11 +770,9 @@ layout: default
 
 **Then validate the syntax online:**
 
-1. Open <a href="https://ttl.summerofcode.be/">ttl.summerofcode.be</a>  
-   *(fastest, just paste and click "Validate")*
-2. Alternative: <a href="https://www.easyrdf.org/converter">easyrdf.org/converter</a>  
-   *(also converts to JSON-LD, N-Triples, …)*
-3. Alternative: <a href="https://sparql.club/validate">sparql.club/validate</a>
+1. Open <a href="https://felixlohmeier.github.io/turtle-web-editor/">turtle-web-editor</a>  
+   *(just paste and click "Validate")*
+2. Alternative: <a href="https://marketplace.visualstudio.com/items?itemName=stardog-union.stardog-rdf-grammars">Install vscode extension</a>  
 
 **Stretch goals:**
 
@@ -639,7 +865,7 @@ layout: default
 layout: section
 ---
 
-# Part 4 — Real-world knowledge graphs
+# Part 5 — Real-world knowledge graphs
 
 Where is Linked Data actually running in production?
 
@@ -767,10 +993,10 @@ Individual Infrastructure Managers building **internal** knowledge graphs.
 <v-clicks>
 
 - 🇳🇴 **Bane NOR DIM** (Digital Infrastructure Model)
-  - ~2 billion triples on Norwegian rail
-  - Feeds planning, maintenance, signalling, traffic management
-- 🇧🇪 **Infrabel** — similar journey, railML + SPARQL exports
-- 🔗 Both export to ERA in RINF format — same data, different granularity
+  - ~10 million triples on Norwegian rail
+  - https://data.banenor.no/
+- 🇧🇪 **Infrabel** — similar journey, started from a data centric approach
+- 🔗 Both export to ERA in RDF format for RINF
 
 </v-clicks>
 
@@ -784,8 +1010,7 @@ Individual Infrastructure Managers building **internal** knowledge graphs.
 
 - Railway infrastructure *is* a network
 - Thousands of cross-cutting concerns: signals, power, detection, …
-- Tree/XML formats kept breaking down  
-  (railML v2 was an XML spec — v3 moved to RDF)
+- Tree/XML formats are not flexible and don't leverage W3C standards
 - Enables **"one query, all domains"**
 
 </div>
@@ -804,18 +1029,12 @@ layout: two-cols
 
 The original Linked Data power users.
 
-<v-clicks>
-
 - 🧫 **Bio2RDF** — 11 billion triples across 35+ datasets
 - 💊 **UniProt** — protein database, public SPARQL endpoint
 - 🦠 **ChEMBL, PubChem, Reactome** — all RDF-native
 - 🧠 **Gene Ontology (GO)** — the archetype of a domain ontology
 
-</v-clicks>
-
 ::right::
-
-<v-click>
 
 <div class="mt-4 text-sm">
 
@@ -828,17 +1047,11 @@ The original Linked Data power users.
 
 </div>
 
-</v-click>
-
-<v-click>
-
 <div class="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm">
 
 > Fun fact: UniProt has served federated SPARQL queries since **2014** — predating most enterprise KG projects by a decade.
 
 </div>
-
-</v-click>
 
 ---
 layout: default
@@ -881,8 +1094,6 @@ layout: two-cols
 
 Media & publishing.
 
-<v-clicks>
-
 - 📺 **BBC** "Dynamic Semantic Publishing"  
   The 2010 World Cup site was the proof-of-concept: every page was built from SPARQL queries against an internal KG.
 - 📚 **Springer Nature SciGraph**  
@@ -890,11 +1101,7 @@ Media & publishing.
 - 📰 **The New York Times** — published their vocabulary as LOD.
 - 🎬 **IMDb** — consumed by Wikidata's film items.
 
-</v-clicks>
-
 ::right::
-
-<v-click>
 
 <div class="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm">
 
@@ -903,15 +1110,9 @@ Media & publishing.
 
 </div>
 
-</v-click>
-
-<v-click>
-
 <div class="mt-4 text-sm opacity-75">
 Lesson: Linked Data shines when you have <strong>many editorial domains</strong> that all talk about the same things (people, events, places).
 </div>
-
-</v-click>
 
 ---
 layout: default
@@ -921,8 +1122,6 @@ layout: default
 
 Linked Data is quietly everywhere in Fortune 500 IT:
 
-<v-clicks>
-
 - 🏦 **Banks** (JP Morgan, ING) — risk aggregation, FIBO ontology
 - 🛒 **Retail** (Amazon, eBay) — product KGs, recommendations
 - 🚗 **Automotive** (BMW, Volkswagen) — parts & manufacturing graphs
@@ -930,21 +1129,15 @@ Linked Data is quietly everywhere in Fortune 500 IT:
 - 🛰️ **Aerospace** (NASA, Airbus) — digital twins
 - 🤖 **RAG / LLM** — KGs as grounding for large language models (2024-2026 boom)
 
-</v-clicks>
-
-<v-click>
-
 <div class="mt-6 p-3 bg-blue-50 dark:bg-blue-900 rounded text-gray-800 dark:text-gray-100 text-sm">
 🔥 <strong>2026 trend:</strong> "GraphRAG" — retrieving a <em>subgraph</em> rather than text chunks. Knowledge graphs are having a moment again.
 </div>
-
-</v-click>
 
 ---
 layout: section
 ---
 
-# Part 5 — Ontologies & vocabularies
+# Part 6 — Ontologies & vocabularies
 
 Shared meaning
 
@@ -1083,7 +1276,7 @@ schema:spouse owl:inverseOf schema:spouse .
 layout: section
 ---
 
-# Part 6 — SPARQL
+# Part 7 — SPARQL
 
 Querying the graph
 
@@ -1279,12 +1472,11 @@ layout: default
   PREFIX gsp: <http://www.opengis.net/ont/geosparql#>
   ```
 - Country IRIs live under <br><code>http://publications.europa.eu/resource/authority/country/</code> (e.g. `.../BEL`, `.../FRA`)
-- Key classes: `era:OperationalPoint`, `era:SectionOfLine`, `era:Tunnel`
-- Key properties: `era:opName`, `era:inCountry`, `era:maximumPermittedSpeed`, `era:length`
+- Key classes: `era:OperationalPoint`, `era:SectionOfLine`
+- Key properties: `era:opName`, `era:inCountry`
 
 **Stretch goals:**
 
-- 🌟 Add `ORDER BY`, `LIMIT`, and a `FILTER`
 - 🌟 Write it as a `CONSTRUCT` that reshapes to `schema:TrainStation`
 - 🌟 Federate with `SERVICE <https://query.wikidata.org/sparql>` to pull city populations
 
@@ -1326,12 +1518,16 @@ layout: default
 
 ```sparql
 PREFIX era: <http://data.europa.eu/949/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 SELECT ?system (COUNT(?sol) AS ?sections)
 WHERE {
-  ?sol a era:SectionOfLine ;
-       era:inCountry <http://publications.europa.eu/resource/authority/country/BEL> ;
-       era:contactLineSystem ?system .
+  ?sol a era:SectionOfLine;  
+    era:inCountry <http://publications.europa.eu/resource/authority/country/BEL> ;
+    era:hasPart ?track .
+  
+  ?track a era:RunningTrack ;
+    era:contactLineSystem/era:energySupplySystem/skos:prefLabel ?system .
 }
 GROUP BY ?system
 ORDER BY DESC(?sections)
@@ -1349,7 +1545,7 @@ ORDER BY DESC(?sections)
 layout: section
 ---
 
-# Part 7 — SHACL validation
+# Part 8 — SHACL validation
 
 Is this graph actually correct?
 
@@ -1505,9 +1701,8 @@ layout: default
 
 **2. Run it online:**
 
+- <a href="https://shacl.org/playground/">shacl.org/playground/</a>
 - <a href="https://shacl-play.sparna.fr/play/validate">shacl-play.sparna.fr/play/validate</a>  
-  *(recommended — paste both files, click validate)*
-- <a href="https://ucuenca.github.io/shacl-playground/">ucuenca.github.io/shacl-playground</a>
 
 **3. Interpret the report:**
 
@@ -1637,7 +1832,175 @@ Drive <a href="https://rml.io/">RML</a> / <a href="https://www.w3.org/TR/r2rml/"
 layout: section
 ---
 
-# Part 8 — Tools, publishing, wrap-up
+# Part 9 — Linked Data & LLMs
+
+Why knowledge graphs are having a moment
+
+---
+layout: default
+---
+
+# 🤖 The LLM problem, in one slide
+
+LLMs are astonishingly fluent — and astonishingly confident when they're wrong.
+
+<v-clicks>
+
+- 🎭 **Hallucinations** — they invent plausible-sounding facts, IRIs, API signatures, citations
+- 🕰️ **Stale knowledge** — frozen at the training cut-off
+- 🔒 **No access to your data** — they've never seen your CRM, your ERP, your RINF export
+- 🤷 **No provenance** — "who said this? when?" is unanswerable
+- 🧮 **Bad at precise aggregates** — "how many X are there" is a guess, not a count
+
+</v-clicks>
+
+<v-click>
+
+<div class="mt-6 p-3 bg-red-50 dark:bg-red-900 rounded text-gray-800 dark:text-red-100 text-sm">
+❌ For any enterprise use case — compliance, safety, audit, anything with consequences — raw LLM output is not acceptable.
+</div>
+
+</v-click>
+
+---
+layout: default
+---
+
+# 🧠 Retrieval-Augmented Generation (RAG)
+
+The standard patch: retrieve relevant context, stuff it into the prompt, let the LLM summarise.
+
+```mermaid
+flowchart LR
+    Q[❓ User question] --> E[🔢 Embed]
+    E --> V[(🧲 Vector DB<br/>chunks of text)]
+    V -->|top-k chunks| P[📝 Prompt]
+    Q --> P
+    P --> LLM[🤖 LLM]
+    LLM --> A[💬 Answer]
+
+    style V fill:#5c3a1a,color:#fff
+    style LLM fill:#1a3a5c,color:#fff
+```
+
+<v-clicks>
+
+- ✅ Fixes staleness and private data
+- ❌ Still text chunks — no structure, no joins, no aggregates
+- ❌ "How many Belgian stations serve freight?" → vector search can't answer this
+- ❌ Chunks lose context; relationships between entities are invisible
+
+</v-clicks>
+
+---
+layout: default
+---
+
+# 🕸️ GraphRAG — retrieve a subgraph instead
+
+Replace (or augment) the vector DB with a **knowledge graph**.
+
+```mermaid
+flowchart LR
+    Q[❓ User question] --> NL2S[🧠 LLM: NL → SPARQL]
+    NL2S --> KG[(🕸️ Knowledge Graph<br/>SPARQL endpoint)]
+    KG -->|typed results<br/>+ IRIs| P[📝 Prompt]
+    Q --> P
+    P --> LLM[🤖 LLM]
+    LLM --> A[💬 Answer<br/>+ citations]
+
+    style KG fill:#1a5c3a,color:#fff
+    style LLM fill:#1a3a5c,color:#fff
+```
+
+<v-clicks>
+
+- ✅ **Precise** — real aggregates, real joins, real counts
+- ✅ **Typed** — results know they're `schema:Person`, not "a string"
+- ✅ **Cited** — every fact is an IRI the LLM can link back to
+- ✅ **Current** — the graph can be updated independently of the model
+
+</v-clicks>
+
+<v-click>
+
+<div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900 rounded text-gray-800 dark:text-gray-100 text-sm">
+🚂 <strong>Live example:</strong> <a href="https://gitlab.com/mathias.vanden.auweele/era-rinf-chatbot">era-rinf-chatbot</a> — a chatbot I built that answers questions about the European rail network by translating natural language into SPARQL against the <a href="https://data-interop.era.europa.eu/">ERA RINF</a> knowledge graph. Open source, fork away.
+</div>
+
+</v-click>
+
+---
+layout: two-cols
+---
+
+# 📚 Where ontologies help the LLM
+
+<v-clicks>
+
+- 🗺️ **A map of the domain** — classes, properties, relationships the LLM can ground in
+- 🏷️ **Labels & descriptions** — `rdfs:label`, `rdfs:comment`, `skos:definition` give the LLM human-readable anchors
+- 🔁 **Synonyms** — `skos:altLabel` resolves "customer" ↔ "client" ↔ "party"
+- 🔤 **Correct vocabulary** — LLM uses *your* predicates, not invented ones
+- 🧭 **Query planning** — `rdfs:domain` / `rdfs:range` guide NL → SPARQL translation
+- 🌐 **Multilingual** — labels in any language, one graph
+
+</v-clicks>
+
+::right::
+
+<v-click>
+
+```turtle
+# The LLM sees THIS when planning a query:
+era:OperationalPoint
+    a               owl:Class ;
+    rdfs:label      "Operational Point"@en ,
+                    "Exploitatiepunt"@nl ;
+    rdfs:comment    "A location on the rail
+                    network where trains may
+                    start, stop, or change route."@en ;
+    skos:altLabel   "Station"@en ,
+                    "Stop"@en ,
+                    "OP"@en .
+
+era:opName
+    rdfs:domain era:OperationalPoint ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "operational point name"@en .
+```
+
+</v-click>
+
+<!--
+The ontology becomes the LLM's dictionary for the domain. Without it, "station" is just a word.
+-->
+
+---
+layout: default
+---
+
+# ✅ Where SHACL helps the LLM
+
+SHACL is usually sold as *input* validation. In the LLM era, it's especially useful for communicating the structure of the data.
+
+<v-clicks>
+
+- �️ **Describes the actual shape of the data** — which properties *really* appear on a `schema:Person`, cardinalities, value types. Ontologies say what's *possible*; SHACL says what's *there*.
+- 🧠 **Better NL → SPARQL** — the LLM can only write correct queries if it knows the graph's structure. `rdfs:domain`/`range` are hints; shapes are ground truth.
+- �🛡️ **Guardrail for generated RDF** — LLM wants to extract triples from text? Validate before you trust.
+- 🔁 **Self-correction loop** — feed violations back into the prompt: "You produced X; the report says Y is wrong; fix it."
+- 📋 **Prompt scaffolding** — a shape *is* a schema the LLM can follow: "Produce a `schema:Person` with name, jobTitle, worksFor (→ Organization)."
+- 🧾 **Auditability** — every answer carries a validation report — defensible, machine-readable trust.
+- 🤝 **Contract between LLM and KG** — the shape says what's acceptable; nothing else gets merged.
+
+</v-clicks>
+
+---
+layout: section
+---
+
+# Part 10 — Tools, publishing, wrap-up
 
 ---
 layout: default
@@ -1658,21 +2021,30 @@ layout: default
 - 🔹 Blazegraph (Wikidata runs on it — still)
 - 🔹 Qlever (insanely fast, read-only)
 
-</div>
-<div class="bg-gray-100 dark:bg-gray-800 rounded p-3">
-
-**Editors & IDEs**
-
-- 🔹 VS Code + SPARQL Notebook ⭐
-- 🔹 VS Code + Stardog Studio / GraphDB Workbench
-- 🔹 Protégé (ontology design)
-- 🔹 TopBraid Composer
-
 **Web front-ends**
 
 - 🔹 YASGUI (<a href="https://yasgui.matdata.eu/">matdata.eu mirror</a>)
 - 🔹 LODE (docs from OWL)
 - 🔹 WebVOWL (visual ontology)
+
+</div>
+<div class="bg-gray-100 dark:bg-gray-800 rounded p-3">
+
+**Editors & IDEs**
+
+- 🔹 VS Code *(extensions below)* ⭐
+- 🔹 Protégé (ontology design)
+- 🔹 TopBraid Composer
+
+**VS Code extensions**
+
+- 🔹 [SPARQL Notebook](https://marketplace.visualstudio.com/items?itemName=zazuko.sparql-notebook) (`zazuko`) ⭐
+- 🔹 [Stardog Languages](https://marketplace.visualstudio.com/items?itemName=stardog-union.vscode-stardog-languages) — Turtle, SPARQL, TriG, SHACL
+- 🔹 [SHACL Guru](https://marketplace.visualstudio.com/items?itemName=simonstey.shacl-guru) (`simonstey`)
+- 🔹 [Mentor](https://marketplace.visualstudio.com/items?itemName=faubulous.mentor) — ontology explorer
+- 🔹 [RDF Sketch](https://marketplace.visualstudio.com/items?itemName=zazuko.vscode-rdf-sketch) — graph visualizer
+- 🔹 [Linked Data](https://marketplace.visualstudio.com/items?itemName=elsevier.linked-data) (Elsevier)
+- 🔹 [Semantic Web LSP](https://marketplace.visualstudio.com/items?itemName=ajuvercr.semantic-web-lsp)
 
 </div>
 <div class="bg-gray-100 dark:bg-gray-800 rounded p-3">
@@ -1734,6 +2106,7 @@ layout: default
 - ✅ Ontologies & shared vocabularies
 - ✅ SPARQL query basics + federation
 - ✅ SHACL validation
+- ✅ How ontologies & SHACL keep LLMs honest (GraphRAG)
 
 </v-clicks>
 
@@ -1769,6 +2142,8 @@ layout: default
 - 📖 *Validating RDF Data* — book on SHACL (free from bookvalidatingrdf.com)
 - 📖 *The Semantic Web for the Working Ontologist* — Allemang et al.
 - 🌐 <a href="https://kvistgaard.github.io/sparql/">SPARQL wiki</a> by Jerven Bolleman
+- ⭐ <a href="https://github.com/semantalytics/awesome-semantic-web">awesome-semantic-web</a> — curated tools, libs & resources
+- ⭐ <a href="https://github.com/w3c-cg/awesome-semantic-shapes">awesome-semantic-shapes</a> — SHACL / ShEx ecosystem
 
 **Play**
 
@@ -1801,21 +2176,20 @@ class: text-center
 # ❓ Questions?
 
 <div class="text-lg mt-4 opacity-75">
-Or let's just keep writing Turtle together.
 </div>
 
 <div class="mt-10 flex justify-center gap-8 items-center">
   <div class="flex flex-col items-center gap-2">
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://matdata.eu/" class="rounded" />
-    <span class="text-xs text-gray-400">matdata.eu</span>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://github.com/Matdata-eu/slides-linked-data-introduction" class="rounded" />
+    <span class="text-xs text-gray-400">this slide deck</span>
   </div>
   <div class="text-left text-sm">
     <div>🌐 <a href="https://matdata.eu/">matdata.eu</a></div>
-    <div>🧪 <a href="https://yasgui.matdata.eu/">yasgui.matdata.eu</a></div>
     <div>🐙 <a href="https://github.com/Matdata-eu">github.com/Matdata-eu</a></div>
+    <div>🧪 <a href="https://github.com/Matdata-eu/slides-linked-data-introduction">github.com/Matdata-eu/slides-linked-data-introduction</a></div>
   </div>
 </div>
 
 <div class="abs-bottom m-6 text-xs opacity-60">
-Thanks for spending 4 hours on RDF with me. Now go link some data.
+Thanks. Now go link some data.
 </div>
