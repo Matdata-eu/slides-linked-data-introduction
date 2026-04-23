@@ -772,7 +772,7 @@ layout: default
 
 1. Open <a href="https://felixlohmeier.github.io/turtle-web-editor/">turtle-web-editor</a>  
    *(just paste and click "Validate")*
-2. Alternative: <a href="https://marketplace.visualstudio.com/items?itemName=stardog-union.stardog-rdf-grammars">Install vscode extension</a>  
+2. Alternative: <a href="https://marketplace.visualstudio.com/items?itemName=stardog-union.stardog-rdf-grammars">Install vscode extension: Stardog RDF Grammars</a>  
 
 **Stretch goals:**
 
