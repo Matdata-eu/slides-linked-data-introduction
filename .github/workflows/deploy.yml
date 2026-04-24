@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Build Slidev
-        run: npm run build -- --base /linked-data-introduction/
+        run: npm run build -- --base /slides-linked-data-introduction/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
